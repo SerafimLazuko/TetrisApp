@@ -1,4 +1,5 @@
 ﻿
+using System.Windows.Forms;
 using TetrisApp.Figures;
 
 namespace TetrisApp.Game
@@ -180,9 +181,8 @@ namespace TetrisApp.Game
                         return;
                     }
 
-                    map.DrawAtomInPosition(atom);
-
                     atom.Invoke((MethodInvoker)delegate {
+                        map.DrawAtomInPosition(atom);
                         atom.Enabled = false;
                     });
                     
@@ -252,14 +252,20 @@ namespace TetrisApp.Game
             {
                 if (e.atomNamesToRemove.Contains(control.Name))
                 {
-                    gameSpaceControl.Controls.Remove(control);
-                    control.Dispose();
+                    gameSpaceControl.Invoke((MethodInvoker)delegate
+                    {
+                        gameSpaceControl.Controls.Remove(control);
+                        control.Dispose();
+                    });
                 }
             }
 
-            var controlsToMoveDown = gameSpaceControl.Controls.OfType<Button>().Where(b => e.atomNamesToMoveDown.Contains(b.Name)).ToList<Button>();
+            gameSpaceControl.Invoke((MethodInvoker)delegate
+            {
+                var controlsToMoveDown = gameSpaceControl.Controls.OfType<Button>().Where(b => e.atomNamesToMoveDown.Contains(b.Name)).ToList<Button>();
+                MapRowFilledControlsDown(controlsToMoveDown);
+            });
 
-            MapRowFilledControlsDown(controlsToMoveDown);
         }
 
         private void OnGameSpaceKeyUp(object sender, KeyEventArgs e)
